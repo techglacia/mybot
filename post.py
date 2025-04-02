@@ -1,12 +1,12 @@
 import os
 import time
+import random
 from instagrapi import Client
 from datetime import datetime
 
-# Configuration (Test Mode)
-FOLDER_PATH = "reels"  # Folder with reels
-TEST_REEL = "test_reel.mp4"  # Name of your test video file
-INTERVAL = 300  # 5 minutes (in seconds)
+# Configuration
+FOLDER_PATH = "reels"
+TEST_REEL = "test_reel.mp4"
 
 def post_reel(client):
     reel_path = os.path.join(FOLDER_PATH, TEST_REEL)
@@ -29,20 +29,29 @@ def post_reel(client):
 def main():
     client = Client()
     
-    # Simplified login (no session saving)
+    # Login with SECRETS
     try:
-        client.login(os.getenv("INSTA_USER"), os.getenv("INSTA_PASS"))
+        creds = os.getenv("SECRETS")
+        if not creds:
+            print("🔴 SECRETS not found in environment variables!")
+            return
+        username, password = creds.split(":")
+        client.login(username, password)
         print("🔑 Login successful")
     except Exception as e:
         print(f"🔴 Login failed: {str(e)}")
         return
 
-    # Test loop
+    # Main loop with random intervals (300-600 seconds = 5-10 mins)
     while True:
-        print(f"\n🕒 Attempting test post at {datetime.now().strftime('%H:%M:%S')}")
+        delay = random.randint(300, 600)  # Random delay between 5-10 minutes
+        next_post = datetime.now().timestamp() + delay
+        
+        print(f"\n🕒 Next post at {datetime.fromtimestamp(next_post).strftime('%H:%M:%S')}")
         post_reel(client)
-        print(f"⏳ Next attempt in {INTERVAL//60} minutes...")
-        time.sleep(INTERVAL)
+        
+        print(f"⏳ Waiting {delay//60} minutes...")
+        time.sleep(delay)
 
 if __name__ == "__main__":
     main()
