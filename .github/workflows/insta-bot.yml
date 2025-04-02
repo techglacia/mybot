@@ -1,1 +1,15 @@
+# .github/workflows/test.yml
+name: Test Poster
+on: workflow_dispatch  # Manual trigger only
 
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+      - run: pip install instagrapi
+      - run: python post.py
+        env:
+          INSTA_USER: ${{ secrets.INSTA_USER }}
+          INSTA_PASS: ${{ secrets.INSTA_PASS }}
